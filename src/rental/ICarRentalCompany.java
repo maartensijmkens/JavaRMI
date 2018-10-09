@@ -15,4 +15,6 @@ public interface ICarRentalCompany extends Remote {
 	Reservation confirmQuote(Quote quote) throws ReservationException, RemoteException;
 	
 	List<Reservation>getReservationsByRenter(String clientName) throws RemoteException;
+
+	int getNumberOfReservationForCarType(String carType) throws RemoteException;
 }

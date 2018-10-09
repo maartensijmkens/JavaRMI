@@ -180,7 +180,7 @@ public class CarRentalCompany implements ICarRentalCompany {
 	public int getNumberOfReservationForCarType(String carType) {
 		int number = 0;
 		for (Car c: cars) {
-			if (c.getType().getName() ==  carType) {
+			if (c.getType().getName().equals(carType)) {
 				number += c.getNumberReservations();
 			}
 		}

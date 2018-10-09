@@ -42,8 +42,7 @@ public class Client extends AbstractTestBooking {
 	public Client(String scriptFile, String carRentalCompanyName) throws RemoteException, NotBoundException {
 		super(scriptFile);
 		Registry registry = LocateRegistry.getRegistry("localhost");
-        company = (ICarRentalCompany) registry.lookup("Hertz");
-		//throw new UnsupportedOperationException("TODO");
+        company = (ICarRentalCompany) registry.lookup(carRentalCompanyName);
 	}
 	
 	/**
@@ -131,7 +130,6 @@ public class Client extends AbstractTestBooking {
 	 */
 	@Override
 	protected int getNumberOfReservationsForCarType(String carType) throws Exception {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("TODO");
+		return company.getNumberOfReservationForCarType(carType);
 	}
 }
