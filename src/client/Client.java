@@ -1,10 +1,17 @@
 package client;
 
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import rental.Quote;
 import rental.Reservation;
+import rental.CarType;
+import rental.ICarRentalCompany;
 
 public class Client extends AbstractTestBooking {
 	
@@ -19,16 +26,22 @@ public class Client extends AbstractTestBooking {
 		// An example reservation scenario on car rental company 'Hertz' would be...
 		Client client = new Client("simpleTrips", carRentalCompanyName);
 		client.run();
+		client.checkForAvailableCarTypes(new Date(), new Date());
 	}
 	
+	public ICarRentalCompany company;
+	
 	/***************
-	 * CONSTRUCTOR *
+	 * CONSTRUCTOR 
+	 * @throws RemoteException 
+	 * @throws NotBoundException *
 	 ***************/
 	
-	public Client(String scriptFile, String carRentalCompanyName) {
+	public Client(String scriptFile, String carRentalCompanyName) throws RemoteException, NotBoundException {
 		super(scriptFile);
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("TODO");
+		Registry registry = LocateRegistry.getRegistry("localhost");
+        company = (ICarRentalCompany) registry.lookup("Hertz");
+		//throw new UnsupportedOperationException("TODO");
 	}
 	
 	/**
@@ -44,8 +57,12 @@ public class Client extends AbstractTestBooking {
 	 */
 	@Override
 	protected void checkForAvailableCarTypes(Date start, Date end) throws Exception {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("TODO");
+		Set<CarType> carTypes = company.getAvailableCarTypes(start, end);
+		for (CarType s : carTypes) {
+		    System.out.println(s);
+		}
+		System.out.println("Test");
+		// throw new UnsupportedOperationException("TODO");
 	}
 
 	/**

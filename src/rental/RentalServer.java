@@ -3,6 +3,10 @@ package rental;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.rmi.AlreadyBoundException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +15,7 @@ import java.util.StringTokenizer;
 public class RentalServer {
 	
 	public static void main(String[] args) throws ReservationException,
-			NumberFormatException, IOException {
+			NumberFormatException, IOException, AlreadyBoundException {
 		CrcData data  = loadData("hertz.csv");
 		CarRentalCompany company = new CarRentalCompany(data.name, data.regions, data.cars);
 		ICarRentalCompany stub = (ICarRentalCompany) UnicastRemoteObject.exportObject(company, 0);
