@@ -16,6 +16,8 @@ public class RentalServer {
 	
 	public static void main(String[] args) throws ReservationException,
 			NumberFormatException, IOException, AlreadyBoundException {
+		System.setSecurityManager(null);
+		
 		CrcData data  = loadData("hertz.csv");
 		CarRentalCompany company = new CarRentalCompany(data.name, data.regions, data.cars);
 		ICarRentalCompany stub = (ICarRentalCompany) UnicastRemoteObject.exportObject(company, 0);

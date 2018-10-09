@@ -1,5 +1,6 @@
 package rental;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -137,6 +138,12 @@ public class CarRentalCompany implements ICarRentalCompany {
 		
 		return new Quote(client, constraints.getStartDate(), constraints.getEndDate(), getName(), constraints.getCarType(), price);
 	}
+	
+	public Quote createQuote(String clientName, Date start, Date end, String carType, String region)
+			throws ReservationException {
+		ReservationConstraints constraints = new ReservationConstraints(start, end, carType, region);
+		return createQuote(constraints, clientName);
+	}
 
 	// Implementation can be subject to different pricing strategies
 	private double calculateRentalPrice(double rentalPricePerDay, Date start, Date end) {
@@ -156,10 +163,28 @@ public class CarRentalCompany implements ICarRentalCompany {
 		car.addReservation(res);
 		return res;
 	}
+	
+	public List<Reservation>getReservationsByRenter(String clientName) {
+		List<Reservation> result = new ArrayList<>();
+		for (Car c: cars) {
+			result.addAll(c.getReservationsByName(clientName));
+		}
+		return result;
+	}
 
 	public void cancelReservation(Reservation res) {
 		logger.log(Level.INFO, "<{0}> Cancelling reservation {1}", new Object[]{name, res.toString()});
 		getCar(res.getCarId()).removeReservation(res);
+	}
+	
+	public int getNumberOfReservationForCarType(String carType) {
+		int number = 0;
+		for (Car c: cars) {
+			if (c.getType().getName() ==  carType) {
+				number += c.getNumberReservations();
+			}
+		}
+		return number;
 	}
 	
 	@Override
