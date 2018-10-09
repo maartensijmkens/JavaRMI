@@ -13,7 +13,10 @@ public class RentalServer {
 	public static void main(String[] args) throws ReservationException,
 			NumberFormatException, IOException {
 		CrcData data  = loadData("hertz.csv");
-		new CarRentalCompany(data.name, data.regions, data.cars);
+		CarRentalCompany company = new CarRentalCompany(data.name, data.regions, data.cars);
+		ICarRentalCompany stub = (ICarRentalCompany) UnicastRemoteObject.exportObject(company, 0);
+		Registry registry = LocateRegistry.getRegistry();
+        registry.bind("Hertz", stub);
 	}
 
 	public static CrcData loadData(String datafile)
