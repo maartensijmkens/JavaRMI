@@ -18,4 +18,6 @@ public interface IManagerSession extends Remote {
     int getNumberOfReservationsBy(String client) throws RemoteException;
 
     Set<String> getBestCustomer() throws RemoteException;
+
+    CarType getMostPopularCarTypeIn(String company, int year) throws RemoteException;
 }

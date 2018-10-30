@@ -60,7 +60,8 @@ public class CarRentalCompany implements ICarRentalCompany {
     public List<String> getRegions() {
         return this.regions;
     }
-    
+
+    @Override
     public boolean hasRegion(String region) {
         return this.regions.contains(region);
     }
@@ -69,8 +70,9 @@ public class CarRentalCompany implements ICarRentalCompany {
 	 * CAR TYPES *
 	 *************/
 
-	public Collection<CarType> getAllCarTypes() {
-		return carTypes.values();
+	@Override
+	public Set<CarType> getAllCarTypes() {
+		return new HashSet<>(carTypes.values());
 	}
 	
 	public CarType getCarType(String carTypeName) {
@@ -99,7 +101,7 @@ public class CarRentalCompany implements ICarRentalCompany {
 		}
 		return availableCarTypes;
 	}
-	
+
 	/*********
 	 * CARS *
 	 *********/

@@ -29,6 +29,25 @@ public class ReservationSession implements IReservationSession {
     }
 
     @Override
+    public String getCheapestCarType(Date start, Date end, String region) throws RemoteException {
+        Set<String> companies = getAllRentalCompanies();
+        String cheapest = null;
+        double currentPrice = Double.MAX_VALUE;
+        for (String company : companies) {
+            if (RentalServer.getCompany(company).hasRegion(region)) {
+                Set<CarType> carTypes = RentalServer.getCompany(company).getAvailableCarTypes(start, end);
+                for (CarType carType : carTypes) {
+                    if (carType.getRentalPricePerDay() < currentPrice) {
+                        currentPrice = carType.getRentalPricePerDay();
+                        cheapest = carType.getName();
+                    }
+                }
+            }
+        }
+        return cheapest;
+    }
+
+    @Override
     public synchronized void createQuote(ReservationConstraints constraints, String client) throws Exception {
         Set<String> companies = getAllRentalCompanies();
         Exception exception = null;

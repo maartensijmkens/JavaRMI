@@ -70,4 +70,19 @@ public class ManagerSession implements IManagerSession {
         }
         return bestClients;
     }
+
+    @Override
+    public CarType getMostPopularCarTypeIn(String company, int year) throws RemoteException {
+         Set<CarType> carTypes = RentalServer.getCompany(company).getAllCarTypes();
+         CarType mostPopular = null;
+         int most = 0;
+         for (CarType carType : carTypes) {
+             int current = RentalServer.getCompany(company).getNumberOfReservationForCarType(carType.getName());
+             if (current > most) {
+                 most = current;
+                 mostPopular = carType;
+             }
+         }
+         return mostPopular;
+    }
 }

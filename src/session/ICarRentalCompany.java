@@ -25,9 +25,11 @@ public interface ICarRentalCompany extends Remote {
 
 	int getNumberOfReservationForCarType(String carType) throws RemoteException;
 
-    Collection<CarType> getAllCarTypes() throws RemoteException;
+    Set<CarType> getAllCarTypes() throws RemoteException;
 
     List<Car> getCars() throws RemoteException;
 
     Set<String> getClients() throws RemoteException;
+
+	boolean hasRegion(String region) throws RemoteException;
 }

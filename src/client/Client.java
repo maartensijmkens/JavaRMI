@@ -8,10 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import rental.Quote;
 import rental.Reservation;
 import rental.CarType;
-import session.ICarRentalCompany;
 import session.IManagerSession;
 import session.IRentalServer;
 import session.IReservationSession;
@@ -52,13 +50,13 @@ public class Client extends AbstractTestManagement<IReservationSession, IManager
 	}
 
 	@Override
-	protected String getCheapestCarType(IReservationSession iReservationSession, Date start, Date end, String region) throws Exception {
-		return null;
+	protected String getCheapestCarType(IReservationSession reservationSession, Date start, Date end, String region) throws Exception {
+		return reservationSession.getCheapestCarType(start, end, region);
 	}
 
 	@Override
 	protected CarType getMostPopularCarTypeIn(IManagerSession ms, String carRentalCompanyName, int year) throws Exception {
-		return null;
+		return ms.getMostPopularCarTypeIn(carRentalCompanyName, year);
 	}
 
 	@Override
