@@ -1,29 +1,72 @@
 package rental;
 
+import session.ICarRentalCompany;
+import session.IManagerSession;
+import session.IRentalServer;
+import session.IReservationSession;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
-public class RentalServer {
-	
+public class RentalServer implements IRentalServer {
+
+    static Map<String, ICarRentalCompany> companies = new HashMap<>();
+
 	public static void main(String[] args) throws ReservationException,
-			NumberFormatException, IOException, AlreadyBoundException {
+            NumberFormatException, IOException, AlreadyBoundException, NotBoundException {
 		System.setSecurityManager(null);
-		
-		CrcData data  = loadData("hertz.csv");
-		CarRentalCompany company = new CarRentalCompany(data.name, data.regions, data.cars);
-		ICarRentalCompany stub = (ICarRentalCompany) UnicastRemoteObject.exportObject(company, 0);
-		Registry registry = LocateRegistry.getRegistry();
-        registry.bind(data.name, stub);
+
+        RentalServer rentalServer = new RentalServer();
+        IRentalServer serverStub = (IRentalServer) UnicastRemoteObject.exportObject(rentalServer, 0);
+        LocateRegistry.getRegistry().bind(IRentalServer.name,serverStub);
+
+		String[] companies = {"hertz", "dockx"};
+		for (String name : companies) {
+            CrcData data = loadData(name + ".csv");
+            CarRentalCompany company = new CarRentalCompany(data.name, data.regions, data.cars);
+            ICarRentalCompany companyStub = (ICarRentalCompany) UnicastRemoteObject.exportObject(company, 0);
+            LocateRegistry.getRegistry().bind(data.name, companyStub);
+            rentalServer.registerCompany(data.name);
+        }
+
+
 	}
+
+	@Override
+    public IReservationSession createReservationSession() throws RemoteException, NotBoundException {
+        return (IReservationSession) UnicastRemoteObject.exportObject(new ReservationSession(), 0);
+    }
+
+    @Override
+    public IManagerSession createManagerSession() throws RemoteException, NotBoundException {
+        return (IManagerSession) UnicastRemoteObject.exportObject(new ManagerSession(), 0);
+    }
+
+    public static synchronized Map<String, ICarRentalCompany> getCompanies() {
+	    return companies;
+    }
+
+    public static synchronized ICarRentalCompany getCompany(String name) {
+	    if (companies.containsKey(name))
+            return companies.get(name);
+        throw new IllegalArgumentException("Company not registered: " + name);
+    }
+
+	public static void registerCompany(String name) throws RemoteException, NotBoundException {
+        companies.put(name, (ICarRentalCompany) LocateRegistry.getRegistry().lookup(name));
+    }
+
+
+    public static void unregisterCompany(String name) {
+	    companies.remove(name);
+    }
 
 	public static CrcData loadData(String datafile)
 			throws ReservationException, NumberFormatException, IOException {

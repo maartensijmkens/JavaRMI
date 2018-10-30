@@ -1,5 +1,7 @@
 package rental;
 
+import session.ICarRentalCompany;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -19,7 +21,8 @@ public class CarRentalCompany implements ICarRentalCompany {
 	private List<String> regions;
 	private String name;
 	private List<Car> cars;
-	private Map<String,CarType> carTypes = new HashMap<String, CarType>();
+	private Map<String,CarType> carTypes = new HashMap<>();
+	private Set<String> clients = new HashSet<>();
 
 	/***************
 	 * CONSTRUCTOR *
@@ -82,6 +85,7 @@ public class CarRentalCompany implements ICarRentalCompany {
 		if(carTypes.containsKey(carTypeName)) {
 			return getAvailableCarTypes(start, end).contains(carTypes.get(carTypeName));
 		} else {
+			//return false;
 			throw new IllegalArgumentException("<" + carTypeName + "> No car type of name " + carTypeName);
 		}
 	}
@@ -107,6 +111,10 @@ public class CarRentalCompany implements ICarRentalCompany {
 		}
 		throw new IllegalArgumentException("<" + name + "> No car with uid " + uid);
 	}
+
+	public List<Car> getCars() {
+		return cars;
+	}
 	
 	private List<Car> getAvailableCars(String carType, Date start, Date end) {
 		List<Car> availableCars = new LinkedList<Car>();
@@ -118,12 +126,19 @@ public class CarRentalCompany implements ICarRentalCompany {
 		return availableCars;
 	}
 
+	public Set<String> getClients() {
+		return clients;
+	}
+
 	/****************
 	 * RESERVATIONS *
 	 ****************/
 
-	public Quote createQuote(ReservationConstraints constraints, String client)
+	public synchronized Quote createQuote(ReservationConstraints constraints, String client)
 			throws ReservationException {
+		if(!clients.contains(client)) {
+			clients.add(client);
+		}
 		logger.log(Level.INFO, "<{0}> Creating tentative reservation for {1} with constraints {2}", 
                         new Object[]{name, client, constraints.toString()});
 		
@@ -164,7 +179,7 @@ public class CarRentalCompany implements ICarRentalCompany {
 		return res;
 	}
 	
-	public List<Reservation>getReservationsByRenter(String clientName) {
+	public List<Reservation> getReservationsByRenter(String clientName) {
 		List<Reservation> result = new ArrayList<>();
 		for (Car c: cars) {
 			result.addAll(c.getReservationsByName(clientName));

@@ -11,9 +11,12 @@ import java.util.Set;
 import rental.Quote;
 import rental.Reservation;
 import rental.CarType;
-import rental.ICarRentalCompany;
+import session.ICarRentalCompany;
+import session.IManagerSession;
+import session.IRentalServer;
+import session.IReservationSession;
 
-public class Client extends AbstractTestBooking {
+public class Client extends AbstractTestManagement<IReservationSession, IManagerSession> {
 	
 	/********
 	 * MAIN *
@@ -23,15 +26,12 @@ public class Client extends AbstractTestBooking {
 		
 		System.setSecurityManager(null);
 		
-		String carRentalCompanyName = "Hertz";
-		
 		// An example reservation scenario on car rental company 'Hertz' would be...
-		Client client = new Client("simpleTrips", carRentalCompanyName);
+		Client client = new Client("trips", IRentalServer.name);
 		client.run();
-		//client.checkForAvailableCarTypes(new Date(2018,9,10), new Date(2018,10,1));
 	}
 	
-	public ICarRentalCompany company;
+	public IRentalServer rentalServer;
 	
 	/***************
 	 * CONSTRUCTOR 
@@ -39,97 +39,65 @@ public class Client extends AbstractTestBooking {
 	 * @throws NotBoundException *
 	 ***************/
 	
-	public Client(String scriptFile, String carRentalCompanyName) throws RemoteException, NotBoundException {
+	public Client(String scriptFile, String serverName) throws RemoteException, NotBoundException {
 		super(scriptFile);
 		Registry registry = LocateRegistry.getRegistry("localhost");
-        company = (ICarRentalCompany) registry.lookup(carRentalCompanyName);
-	}
-	
-	/**
-	 * Check which car types are available in the given period
-	 * and print this list of car types.
-	 *
-	 * @param 	start
-	 * 			start time of the period
-	 * @param 	end
-	 * 			end time of the period
-	 * @throws 	Exception
-	 * 			if things go wrong, throw exception
-	 */
-	@Override
-	protected void checkForAvailableCarTypes(Date start, Date end) throws Exception {
-			Set<CarType> carTypes = company.getAvailableCarTypes(start, end);
-			for (CarType s : carTypes) {
-				System.out.println(s);
-			}
+        rentalServer = (IRentalServer) registry.lookup(serverName);
 	}
 
-	/**
-	 * Retrieve a quote for a given car type (tentative reservation).
-	 * 
-	 * @param	clientName 
-	 * 			name of the client 
-	 * @param 	start 
-	 * 			start time for the quote
-	 * @param 	end 
-	 * 			end time for the quote
-	 * @param 	carType 
-	 * 			type of car to be reserved
-	 * @param 	region
-	 * 			region in which car must be available
-	 * @return	the newly created quote
-	 *  
-	 * @throws 	Exception
-	 * 			if things go wrong, throw exception
-	 */
+
 	@Override
-	protected Quote createQuote(String clientName, Date start, Date end,
-			String carType, String region) throws Exception {
-		return company.createQuote(clientName, start, end, carType, region);
+	protected Set<String> getBestClients(IManagerSession ms) throws Exception {
+		return ms.getBestCustomer();
 	}
 
-	/**
-	 * Confirm the given quote to receive a final reservation of a car.
-	 * 
-	 * @param 	quote 
-	 * 			the quote to be confirmed
-	 * @return	the final reservation of a car
-	 * 
-	 * @throws 	Exception
-	 * 			if things go wrong, throw exception
-	 */
 	@Override
-	protected Reservation confirmQuote(Quote quote) throws Exception {
-		return company.confirmQuote(quote);
-	}
-	
-	/**
-	 * Get all reservations made by the given client.
-	 *
-	 * @param 	clientName
-	 * 			name of the client
-	 * @return	the list of reservations of the given client
-	 * 
-	 * @throws 	Exception
-	 * 			if things go wrong, throw exception
-	 */
-	@Override
-	protected List<Reservation> getReservationsByRenter(String clientName) throws Exception {
-		return company.getReservationsByRenter(clientName);
+	protected String getCheapestCarType(IReservationSession iReservationSession, Date start, Date end, String region) throws Exception {
+		return null;
 	}
 
-	/**
-	 * Get the number of reservations for a particular car type.
-	 * 
-	 * @param 	carType 
-	 * 			name of the car type
-	 * @return 	number of reservations for the given car type
-	 * 
-	 * @throws 	Exception
-	 * 			if things go wrong, throw exception
-	 */
 	@Override
-	protected int getNumberOfReservationsForCarType(String carType) throws Exception {
-		return company.getNumberOfReservationForCarType(carType);
+	protected CarType getMostPopularCarTypeIn(IManagerSession ms, String carRentalCompanyName, int year) throws Exception {
+		return null;
+	}
+
+	@Override
+	protected IReservationSession getNewReservationSession(String name) throws Exception {
+		return rentalServer.createReservationSession();
+	}
+
+	@Override
+	protected IManagerSession getNewManagerSession(String name, String carRentalName) throws Exception {
+		return rentalServer.createManagerSession();
+	}
+
+	@Override
+	protected void checkForAvailableCarTypes(IReservationSession reservationSession, Date start, Date end) throws RemoteException {
+		Set<CarType> carTypes = reservationSession.getAvailableCarTypes(start, end);
+		System.out.print("Available cars: ");
+		for (CarType carType : carTypes) {
+			System.out.print(carType.getName() + ", ");
+		}
+		System.out.println();
+	}
+
+	@Override
+	protected void addQuoteToSession(IReservationSession reservationSession, String name, Date start, Date end, String carType, String region) throws Exception {
+		reservationSession.createQuote(start, end, carType, region, name);
+	}
+
+	@Override
+	protected List<Reservation> confirmQuotes(IReservationSession reservationSession, String name) throws Exception {
+		return reservationSession.confirmQuotes(name);
+	}
+
+	@Override
+	protected int getNumberOfReservationsBy(IManagerSession ms, String clientName) throws Exception {
+		return ms.getNumberOfReservationsBy(clientName);
+	}
+
+	@Override
+	protected int getNumberOfReservationsForCarType(IManagerSession ms, String carRentalName, String carType) throws Exception {
+        return ms.getNumberOfReservations(carRentalName).get(carType);
 	}
 }
