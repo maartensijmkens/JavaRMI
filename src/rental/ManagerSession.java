@@ -18,20 +18,8 @@ public class ManagerSession implements IManagerSession {
     }
 
     @Override
-    public Map<String,Integer> getNumberOfReservations(String company) throws RemoteException {
-        Map<String,Integer> map = new HashMap<>();
-        List<Car> cars = RentalServer.getCompany(company).getCars();
-        for (Car car : cars) {
-            String carType = car.getType().getName();
-            int nb = car.getAllReservations().size();
-            if (map.containsKey(carType)) {
-                map.put(carType, map.get(carType)+nb);
-            }
-            else {
-                map.put(carType, nb);
-            }
-        }
-        return map;
+    public int getNumberOfReservations(String company, String carType) throws RemoteException {
+        return RentalServer.getCompany(company).getNumberOfReservationForCarType(carType);
     }
 
     @Override

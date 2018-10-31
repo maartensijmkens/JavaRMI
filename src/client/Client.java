@@ -96,6 +96,6 @@ public class Client extends AbstractTestManagement<IReservationSession, IManager
 
 	@Override
 	protected int getNumberOfReservationsForCarType(IManagerSession ms, String carRentalName, String carType) throws Exception {
-        return ms.getNumberOfReservations(carRentalName).get(carType);
+        return ms.getNumberOfReservations(carRentalName, carType);
 	}
 }
