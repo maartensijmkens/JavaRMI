@@ -50,17 +50,17 @@ public class RentalServer implements IRentalServer {
         return (IManagerSession) UnicastRemoteObject.exportObject(new ManagerSession(), 0);
     }
 
-    public static synchronized Map<String, ICarRentalCompany> getCompanies() {
+    public static Map<String, ICarRentalCompany> getCompanies() {
 	    return companies;
     }
 
-    public static synchronized ICarRentalCompany getCompany(String name) {
+    public static ICarRentalCompany getCompany(String name) {
 	    if (companies.containsKey(name))
             return companies.get(name);
         throw new IllegalArgumentException("Company not registered: " + name);
     }
 
-	public static void registerCompany(String name) throws RemoteException, NotBoundException {
+	public static synchronized void registerCompany(String name) throws RemoteException, NotBoundException {
         companies.put(name, (ICarRentalCompany) LocateRegistry.getRegistry().lookup(name));
     }
 

@@ -10,12 +10,12 @@ public class ReservationSession implements IReservationSession {
     Set<Quote> quotes = new HashSet<>();
 
     @Override
-    public synchronized Set<String> getAllRentalCompanies() throws RemoteException {
+    public Set<String> getAllRentalCompanies() throws RemoteException {
         return new HashSet<>(RentalServer.getCompanies().keySet());
     }
 
     @Override
-    public synchronized Set<CarType> getAvailableCarTypes(Date start, Date end) throws RemoteException {
+    public Set<CarType> getAvailableCarTypes(Date start, Date end) throws RemoteException {
         Set<String> companies = getAllRentalCompanies();
         Set<CarType> carTypes = new HashSet<>();
         for (String company : companies) {
@@ -48,7 +48,7 @@ public class ReservationSession implements IReservationSession {
     }
 
     @Override
-    public synchronized void createQuote(ReservationConstraints constraints, String client) throws Exception {
+    public void createQuote(ReservationConstraints constraints, String client) throws Exception {
         Set<String> companies = getAllRentalCompanies();
         Exception exception = null;
         for (String company : companies) {
@@ -71,7 +71,7 @@ public class ReservationSession implements IReservationSession {
     }
 
     @Override
-    public synchronized Set<Quote> getCurrentQuotes() throws RemoteException {
+    public Set<Quote> getCurrentQuotes() throws RemoteException {
         return quotes;
     }
 

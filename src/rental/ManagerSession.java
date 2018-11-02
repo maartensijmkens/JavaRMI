@@ -2,6 +2,8 @@ package rental;
 
 import session.IManagerSession;
 
+import java.rmi.NotBoundException;
+import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.util.*;
 
@@ -72,5 +74,15 @@ public class ManagerSession implements IManagerSession {
              }
          }
          return mostPopular;
+    }
+
+    @Override
+    public void registerCompany(String name) throws RemoteException, NotBoundException {
+        RentalServer.registerCompany(name);
+    }
+
+    @Override
+    public void unregisterCompany(String name) throws NoSuchObjectException {
+        RentalServer.unregisterCompany(name);
     }
 }

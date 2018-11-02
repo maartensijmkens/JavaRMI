@@ -2,6 +2,8 @@ package session;
 
 import rental.CarType;
 
+import java.rmi.NotBoundException;
+import java.rmi.NoSuchObjectException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -19,4 +21,9 @@ public interface IManagerSession extends Remote {
     Set<String> getBestCustomer() throws RemoteException;
 
     CarType getMostPopularCarTypeIn(String company, int year) throws RemoteException;
+
+    void registerCompany(String name) throws RemoteException, NotBoundException;
+
+    void unregisterCompany(String name) throws RemoteException, NoSuchObjectException;
+
 }
