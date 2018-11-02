@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
+import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
@@ -64,8 +65,9 @@ public class RentalServer implements IRentalServer {
     }
 
 
-    public static void unregisterCompany(String name) {
-	    companies.remove(name);
+    public static void unregisterCompany(String name) throws NoSuchObjectException {
+	    UnicastRemoteObject.unexportObject(companies.get(name), true);
+        companies.remove(name);
     }
 
 	public static CrcData loadData(String datafile)

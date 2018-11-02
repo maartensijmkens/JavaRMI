@@ -78,12 +78,14 @@ public class ReservationSession implements IReservationSession {
     @Override
     public synchronized List<Reservation> confirmQuotes(String name) throws ReservationException, RemoteException {
         List<Reservation> reservations = new ArrayList<Reservation>();
+        List<Quote> confirmedQuotes = new ArrayList<Quote>();
         for (Quote quote : this.quotes) {
             if (quote.getCarRenter().equals(name)) {
                 try {
                     String company = quote.getRentalCompany();
                     Reservation reservation = RentalServer.getCompany(company).confirmQuote(quote);
                     reservations.add(reservation);
+                    confirmedQuotes.add(quote);
                 }
                 catch (ReservationException e) {
                     for (Reservation reservation : reservations) {
@@ -93,6 +95,9 @@ public class ReservationSession implements IReservationSession {
                     throw e;
                 }
             }
+        }
+        for (Quote confirmedQuote : confirmedQuotes) {
+            this.quotes.remove(confirmedQuote);
         }
         return reservations;
     }
